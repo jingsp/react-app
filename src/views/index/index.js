@@ -5,19 +5,19 @@ import { connect } from "react-redux";
 import { getOpenid } from "../../reducer/wx.reducer";
 import { redirectPage } from "../../utils/utils";
 import { getBannerList } from "./index.request";
-
+import "./index.scss";
 @connect(state => state.wxData, { getOpenid })
 class Index extends React.Component {
   constructor() {
     super();
     this.state = {
-      bannerList: ["1", "2", "3"],
-      imgHeight: 176
+      bannerList: [],
+      imgHeight: 140
     };
   }
   componentWillMount() {
     //   判断是否有微信openid
-    console.log(this.props);
+    // console.log(this.props);
     const path = this.props.match.path;
     if (!this.props.openid) {
       let code = redirectPage(path);
@@ -25,25 +25,17 @@ class Index extends React.Component {
         this.props.getOpenid(code);
       }
     } else {
-      getBannerList();
+      getBannerList().then(res => {
+        this.setState({ bannerList: res.list });
+      });
     }
   }
 
-  componentDidMount() {
-    setTimeout(() => {
-      this.setState({
-        bannerList: [
-          "AiyWuByWklrrUDlFignR",
-          "TekJlZRVCjLFexlOCuWn",
-          "IJOtIlfsYdTyaDTRVrLI"
-        ]
-      });
-    }, 100);
-  }
+  componentDidMount() {}
 
   render() {
     return (
-      <div>
+      <div className="index-container">
         {this.props.openid ? (
           <div>
             <Carousel
@@ -51,15 +43,11 @@ class Index extends React.Component {
               infinite={true}
               dots={false}
               autoplayInterval={2000}
-              beforeChange={(from, to) =>
-                console.log(`slide from ${from} to ${to}`)
-              }
-              afterChange={index => console.log("slide to", index)}
             >
               {this.state.bannerList.map(val => (
                 <a
                   key={val}
-                  href="http://www.alipay.com"
+                  href={val.url}
                   style={{
                     display: "inline-block",
                     width: "100%",
@@ -67,14 +55,14 @@ class Index extends React.Component {
                   }}
                 >
                   <img
-                    src={`https://zos.alipayobjects.com/rmsportal/${val}.png`}
+                    src={val.imgUrl}
                     alt=""
                     style={{ width: "100%", verticalAlign: "top" }}
-                    onLoad={() => {
-                      // fire window resize event to change height
-                      window.dispatchEvent(new Event("resize"));
-                      this.setState({ imgHeight: "auto" });
-                    }}
+                    // onLoad={() => {
+                    //   // fire window resize event to change height
+                    //   window.dispatchEvent(new Event("resize"));
+                    //   // this.setState({ imgHeight: "auto" });
+                    // }}
                   />
                 </a>
               ))}
@@ -83,6 +71,14 @@ class Index extends React.Component {
         ) : (
           ""
         )}
+        <div className="brand-wrapper">
+          <h4>热门商家</h4>
+          <div className="scroll-wrapper">
+            <ul className="logo-list">
+              <li className="logo-item">1111</li>
+            </ul>
+          </div>
+        </div>
       </div>
     );
   }
